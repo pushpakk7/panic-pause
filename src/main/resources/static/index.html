@@ -1,152 +1,259 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panic-Pause | Scam Circuit Breaker</title>
+    <title>Panic-Pause | Enterprise Fraud Detection</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-high { box-shadow: 0 0 40px rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); }
+        .glow-medium { box-shadow: 0 0 40px rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); }
+        .glow-low { box-shadow: 0 0 40px rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-4 font-sans">
+<body class="bg-slate-950 text-slate-200 min-h-screen relative overflow-x-hidden selection:bg-blue-500/30">
 
-<!-- Header Section -->
-<header class="w-full max-w-2xl py-8 text-center">
-    <div class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-400 text-xs font-semibold tracking-wide uppercase mb-3">
-        Financial Self-Defense
-    </div>
-    <h1 class="text-4xl font-extrabold tracking-tight">Panic-Pause</h1>
-    <p class="text-slate-400 text-sm mt-2">Paste suspicious text or upload a screenshot of the message before you pay.</p>
-</header>
+<!-- Background ambient glow -->
+<div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-<!-- Main Input Section -->
-<main class="w-full max-w-2xl bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-
-    <!-- Drag & Drop Image Area -->
-    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:bg-slate-700/50 transition-colors cursor-pointer mb-4 flex flex-col items-center justify-center relative">
-        <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-        <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-        <p class="text-sm text-slate-300 font-medium">Click to upload or drag a screenshot here</p>
-        <p class="text-xs text-slate-500 mt-1">Supports JPG, PNG</p>
-        <!-- Image Preview -->
-        <img id="imagePreview" class="hidden mt-4 max-h-48 rounded border border-slate-600 shadow-md" alt="Preview">
+<div class="max-w-3xl mx-auto px-4 py-12 relative z-10">
+    <!-- Header -->
+    <div class="text-center mb-10 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-medium text-slate-400 tracking-wide uppercase">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            System Active • Gemini Enterprise
+        </div>
+        <h1 class="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+            Panic-Pause
+        </h1>
+        <p class="text-slate-400 text-lg max-w-xl mx-auto font-light">
+            Intercept psychological manipulation before the transaction occurs.
+        </p>
     </div>
 
-    <!-- Text Input Area -->
-    <div class="flex items-center gap-4 mb-4">
-        <hr class="flex-grow border-slate-700">
-        <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">OR PASTE TEXT</span>
-        <hr class="flex-grow border-slate-700">
-    </div>
+    <!-- Main Input Panel -->
+    <div class="glass-panel rounded-2xl p-8 mb-8 shadow-2xl transition-all duration-300" id="inputPanel">
 
-    <textarea id="msgInput" rows="3"
-              placeholder="e.g. 'Your electricity will be disconnected tonight. Pay pending bill here...'"
-              class="w-full bg-slate-950/60 border border-slate-700 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
-
-    <!-- Action Button -->
-    <button id="scanBtn" onclick="runScan()"
-            class="mt-4 w-full bg-blue-600 hover:bg-blue-500 transition-all font-semibold py-3 px-4 rounded-xl text-white shadow-lg shadow-blue-600/30 active:scale-[0.99] flex items-center justify-center gap-2">
-        <span>Analyze Threat Level</span>
-    </button>
-
-    <!-- Scan Results Card (Hidden by default) -->
-    <div id="resultCard" class="hidden mt-6 rounded-xl border p-5 transition-all">
-        <div class="flex items-center justify-between border-b pb-3 mb-3 border-slate-700/60">
-            <div>
-                <span id="badge" class="px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider"></span>
-                <span id="scamType" class="ml-2 font-bold text-sm text-slate-200"></span>
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-slate-400 mb-2 uppercase tracking-wide">1. Upload Evidence</label>
+            <div id="dropZone" class="border-2 border-dashed border-slate-700 rounded-xl p-8 text-center hover:border-blue-500 hover:bg-slate-900/50 transition-all cursor-pointer group">
+                <svg class="mx-auto h-10 w-10 text-slate-500 group-hover:text-blue-400 mb-3 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <p class="text-sm font-medium text-slate-300">Drag & drop a screenshot here</p>
+                <p class="text-xs text-slate-500 mt-1">Supports PNG, JPG, JPEG</p>
+                <input type="file" id="fileInput" class="hidden" accept="image/*">
+                <img id="imagePreview" class="hidden mt-4 max-h-48 mx-auto rounded-lg border border-slate-700 shadow-lg" />
             </div>
-            <span id="confidence" class="text-xs text-slate-400 font-mono"></span>
         </div>
-        <div class="mb-4">
-            <h3 class="text-xs uppercase font-semibold text-slate-400 tracking-wider">The Psychological Trap</h3>
-            <p id="explanation" class="text-sm mt-1 text-slate-200 leading-relaxed"></p>
-        </div>
-        <div class="bg-slate-950/40 rounded-lg p-3 border border-slate-700/50">
-            <h3 class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">What You Should Do</h3>
-            <p id="advice" class="text-sm mt-1 text-slate-300"></p>
-        </div>
-    </div>
-</main>
 
-<!-- JavaScript Logic -->
+        <div class="relative flex items-center py-4">
+            <div class="flex-grow border-t border-slate-800"></div>
+            <span class="flex-shrink-0 mx-4 text-xs font-medium text-slate-600 uppercase tracking-widest">OR</span>
+            <div class="flex-grow border-t border-slate-800"></div>
+        </div>
+
+        <div class="mb-8">
+            <label class="block text-sm font-medium text-slate-400 mb-2 uppercase tracking-wide">2. Paste Message Text</label>
+            <textarea id="textInput" rows="4" class="w-full bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 placeholder-slate-600 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all resize-none shadow-inner" placeholder="E.g., 'URGENT: Your bank account will be locked in 5 minutes unless you verify your identity here...'"></textarea>
+        </div>
+
+        <button id="analyzeBtn" onclick="analyzeThreat()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-4 rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] transition-all flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Initiate Threat Analysis
+        </button>
+    </div>
+
+    <!-- Processing State (Hidden initially) -->
+    <div id="loadingState" class="hidden glass-panel rounded-2xl p-12 text-center shadow-2xl">
+        <div class="relative w-20 h-20 mx-auto mb-6">
+            <div class="absolute inset-0 rounded-full border-t-2 border-blue-500 animate-spin"></div>
+            <div class="absolute inset-2 rounded-full border-r-2 border-indigo-400 animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div>
+            <svg class="absolute inset-0 m-auto w-6 h-6 text-blue-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-white mb-2" id="loadingTitle">Connecting to neural engine...</h3>
+        <p class="text-sm text-slate-400" id="loadingSubtitle">Establishing secure connection.</p>
+    </div>
+
+    <!-- Results Dashboard (Hidden initially) -->
+    <div id="resultState" class="hidden glass-panel rounded-2xl p-8 shadow-2xl transition-all duration-500">
+        <!-- Header section dynamically styled via JS -->
+        <div id="resultHeader" class="flex items-center justify-between border-b border-slate-800 pb-6 mb-6">
+            <div>
+                <div class="flex items-center gap-3 mb-1">
+                    <span id="riskBadge" class="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider"></span>
+                    <span class="text-sm text-slate-400 font-medium font-mono" id="confidenceScore"></span>
+                </div>
+                <h2 id="scamType" class="text-2xl font-bold text-white mt-2"></h2>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div>
+                <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">The Psychological Trap</h4>
+                <p id="explanation" class="text-slate-300 leading-relaxed text-sm"></p>
+            </div>
+
+            <div class="bg-slate-900/80 rounded-xl p-5 border border-slate-800">
+                <h4 class="text-xs font-semibold text-emerald-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Immediate Action Required
+                </h4>
+                <p id="advice" class="text-white font-medium text-sm"></p>
+            </div>
+        </div>
+
+        <button onclick="resetApp()" class="mt-8 w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium py-3 rounded-lg transition-colors">
+            Analyze Another Message
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-12 text-center text-xs text-slate-600 flex items-center justify-center gap-4">
+        <span class="flex items-center gap-1"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> AES-256 Encryption</span>
+        <span>|</span>
+        <span>Zero-Retention Policy</span>
+    </div>
+</div>
+
 <script>
-    let currentBase64Image = null;
+    let base64Image = null;
+
+    // File Drag & Drop Logic
+    const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const imagePreview = document.getElementById('imagePreview');
 
-    // Handle Image Selection and convert to Base64
-    fileInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.classList.remove('hidden');
-                // Extract just the raw base64 string (removes the "data:image/jpeg;base64," part)
-                currentBase64Image = e.target.result.split(',')[1];
-            };
-            reader.readAsDataURL(file);
-        }
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-slate-900/50'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-blue-500', 'bg-slate-900/50'); });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-blue-500', 'bg-slate-900/50');
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
     });
 
-    // The Main Scan Function
-    async function runScan() {
-        const text = document.getElementById('msgInput').value.trim();
-        const btn = document.getElementById('scanBtn');
-        const resultCard = document.getElementById('resultCard');
+    function handleFile(file) {
+        if (!file.type.startsWith('image/')) return alert('Please upload an image file.');
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            base64Image = e.target.result.split(',')[1];
+            imagePreview.src = e.target.result;
+            imagePreview.classList.remove('hidden');
+            dropZone.querySelector('svg').classList.add('hidden');
+            dropZone.querySelector('p').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
 
-        if (!text && !currentBase64Image) {
-            alert("Please paste some text or upload a screenshot first!");
-            return;
-        }
+    async function analyzeThreat() {
+        const text = document.getElementById('textInput').value;
+        if (!text && !base64Image) return alert("Please provide text or upload an image.");
 
-        // UI Loading State
-        btn.disabled = true;
-        btn.innerHTML = 'Analyzing threat indicators...';
-        resultCard.classList.add('hidden');
+        // UI Transitions
+        document.getElementById('inputPanel').classList.add('hidden');
+        document.getElementById('loadingState').classList.remove('hidden');
+
+        // "Hack" the brain: Fake progression phases to increase perceived value
+        const loadingPhases = [
+            { title: "Analyzing linguistics...", sub: "Detecting urgency markers and social engineering patterns." },
+            { title: "Cross-referencing databases...", sub: "Checking global threat signatures." },
+            { title: "Compiling risk matrix...", sub: "Finalizing confidence score." }
+        ];
+        let phase = 0;
+        const phaseInterval = setInterval(() => {
+            if (phase < loadingPhases.length) {
+                document.getElementById('loadingTitle').innerText = loadingPhases[phase].title;
+                document.getElementById('loadingSubtitle').innerText = loadingPhases[phase].sub;
+                phase++;
+            }
+        }, 1200);
 
         try {
-            // Send data to our Spring Boot Backend
-            const res = await fetch('/api/scan', {
+            const response = await fetch('/api/scan', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    text: text,
-                    imageBase64: currentBase64Image
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, imageBase64: base64Image })
             });
 
-            if (!res.ok) throw new Error("Server Error");
-            const data = await res.json();
-
-            // Update UI with results
-            resultCard.classList.remove('hidden');
-            document.getElementById('scamType').innerText = data.scamType;
-            document.getElementById('confidence').innerText = data.confidenceScore + '% confidence';
-            document.getElementById('explanation').innerText = data.explanation;
-            document.getElementById('advice').innerText = data.advice;
-
-            // Change colors based on risk level
-            const badge = document.getElementById('badge');
-            if (data.riskLevel === 'HIGH') {
-                resultCard.className = 'mt-6 rounded-xl border border-red-500/50 bg-red-950/20 p-5';
-                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/40';
-                badge.innerText = 'HIGH RISK SCAM';
-            } else if (data.riskLevel === 'MEDIUM') {
-                resultCard.className = 'mt-6 rounded-xl border border-amber-500/50 bg-amber-950/20 p-5';
-                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
-                badge.innerText = 'SUSPICIOUS';
-            } else {
-                resultCard.className = 'mt-6 rounded-xl border border-emerald-500/50 bg-emerald-950/20 p-5';
-                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
-                badge.innerText = 'LIKELY SAFE';
-            }
-        } catch (err) {
-            alert('Could not connect to backend. Make sure Spring Boot is running!');
-        } finally {
-            // Reset Button
-            btn.disabled = false;
-            btn.innerHTML = '<span>Analyze Threat Level</span>';
+            const result = await response.json();
+            clearInterval(phaseInterval);
+            renderResults(result);
+        } catch (error) {
+            clearInterval(phaseInterval);
+            alert("Connection lost. Please try again.");
+            resetApp();
         }
+    }
+
+    function renderResults(data) {
+        document.getElementById('loadingState').classList.add('hidden');
+        const resultPanel = document.getElementById('resultState');
+        resultPanel.classList.remove('hidden', 'glow-high', 'glow-medium', 'glow-low');
+
+        const badge = document.getElementById('riskBadge');
+
+        // Dynamic Styling based on Risk
+        if (data.riskLevel === 'HIGH') {
+            resultPanel.classList.add('glow-high');
+            badge.className = 'px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30';
+            badge.innerText = 'Critical Threat';
+        } else if (data.riskLevel === 'MEDIUM') {
+            resultPanel.classList.add('glow-medium');
+            badge.className = 'px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            badge.innerText = 'Suspicious';
+        } else {
+            resultPanel.classList.add('glow-low');
+            badge.className = 'px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            badge.innerText = 'Safe / Low Risk';
+        }
+
+        document.getElementById('confidenceScore').innerText = `AI Confidence: ${data.confidenceScore}%`;
+        document.getElementById('scamType').innerText = data.scamType;
+        document.getElementById('explanation').innerText = data.explanation;
+        document.getElementById('advice').innerText = data.advice;
+    }
+
+    function resetApp() {
+        document.getElementById('resultState').classList.add('hidden');
+        document.getElementById('inputPanel').classList.remove('hidden');
+        document.getElementById('textInput').value = '';
+        base64Image = null;
+        imagePreview.classList.add('hidden');
+        imagePreview.src = '';
+        dropZone.querySelector('svg').classList.remove('hidden');
+        dropZone.querySelector('p').classList.remove('hidden');
+
+        // Reset loading text
+        document.getElementById('loadingTitle').innerText = 'Connecting to neural engine...';
+        document.getElementById('loadingSubtitle').innerText = 'Establishing secure connection.';
     }
 </script>
 </body>
