@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panic-Pause | Scam Circuit Breaker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-4 font-sans">
+
+<!-- Header Section -->
+<header class="w-full max-w-2xl py-8 text-center">
+    <div class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-blue-400 text-xs font-semibold tracking-wide uppercase mb-3">
+        Financial Self-Defense
+    </div>
+    <h1 class="text-4xl font-extrabold tracking-tight">Panic-Pause</h1>
+    <p class="text-slate-400 text-sm mt-2">Paste suspicious text or upload a screenshot of the message before you pay.</p>
+</header>
+
+<!-- Main Input Section -->
+<main class="w-full max-w-2xl bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+
+    <!-- Drag & Drop Image Area -->
+    <div id="dropzone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:bg-slate-700/50 transition-colors cursor-pointer mb-4 flex flex-col items-center justify-center relative">
+        <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+        <svg class="w-8 h-8 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+        <p class="text-sm text-slate-300 font-medium">Click to upload or drag a screenshot here</p>
+        <p class="text-xs text-slate-500 mt-1">Supports JPG, PNG</p>
+        <!-- Image Preview -->
+        <img id="imagePreview" class="hidden mt-4 max-h-48 rounded border border-slate-600 shadow-md" alt="Preview">
+    </div>
+
+    <!-- Text Input Area -->
+    <div class="flex items-center gap-4 mb-4">
+        <hr class="flex-grow border-slate-700">
+        <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">OR PASTE TEXT</span>
+        <hr class="flex-grow border-slate-700">
+    </div>
+
+    <textarea id="msgInput" rows="3"
+              placeholder="e.g. 'Your electricity will be disconnected tonight. Pay pending bill here...'"
+              class="w-full bg-slate-950/60 border border-slate-700 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+
+    <!-- Action Button -->
+    <button id="scanBtn" onclick="runScan()"
+            class="mt-4 w-full bg-blue-600 hover:bg-blue-500 transition-all font-semibold py-3 px-4 rounded-xl text-white shadow-lg shadow-blue-600/30 active:scale-[0.99] flex items-center justify-center gap-2">
+        <span>Analyze Threat Level</span>
+    </button>
+
+    <!-- Scan Results Card (Hidden by default) -->
+    <div id="resultCard" class="hidden mt-6 rounded-xl border p-5 transition-all">
+        <div class="flex items-center justify-between border-b pb-3 mb-3 border-slate-700/60">
+            <div>
+                <span id="badge" class="px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider"></span>
+                <span id="scamType" class="ml-2 font-bold text-sm text-slate-200"></span>
+            </div>
+            <span id="confidence" class="text-xs text-slate-400 font-mono"></span>
+        </div>
+        <div class="mb-4">
+            <h3 class="text-xs uppercase font-semibold text-slate-400 tracking-wider">The Psychological Trap</h3>
+            <p id="explanation" class="text-sm mt-1 text-slate-200 leading-relaxed"></p>
+        </div>
+        <div class="bg-slate-950/40 rounded-lg p-3 border border-slate-700/50">
+            <h3 class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">What You Should Do</h3>
+            <p id="advice" class="text-sm mt-1 text-slate-300"></p>
+        </div>
+    </div>
+</main>
+
+<!-- JavaScript Logic -->
+<script>
+    let currentBase64Image = null;
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+
+    // Handle Image Selection and convert to Base64
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+                // Extract just the raw base64 string (removes the "data:image/jpeg;base64," part)
+                currentBase64Image = e.target.result.split(',')[1];
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // The Main Scan Function
+    async function runScan() {
+        const text = document.getElementById('msgInput').value.trim();
+        const btn = document.getElementById('scanBtn');
+        const resultCard = document.getElementById('resultCard');
+
+        if (!text && !currentBase64Image) {
+            alert("Please paste some text or upload a screenshot first!");
+            return;
+        }
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.innerHTML = 'Analyzing threat indicators...';
+        resultCard.classList.add('hidden');
+
+        try {
+            // Send data to our Spring Boot Backend
+            const res = await fetch('/api/scan', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    text: text,
+                    imageBase64: currentBase64Image
+                })
+            });
+
+            if (!res.ok) throw new Error("Server Error");
+            const data = await res.json();
+
+            // Update UI with results
+            resultCard.classList.remove('hidden');
+            document.getElementById('scamType').innerText = data.scamType;
+            document.getElementById('confidence').innerText = data.confidenceScore + '% confidence';
+            document.getElementById('explanation').innerText = data.explanation;
+            document.getElementById('advice').innerText = data.advice;
+
+            // Change colors based on risk level
+            const badge = document.getElementById('badge');
+            if (data.riskLevel === 'HIGH') {
+                resultCard.className = 'mt-6 rounded-xl border border-red-500/50 bg-red-950/20 p-5';
+                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/40';
+                badge.innerText = 'HIGH RISK SCAM';
+            } else if (data.riskLevel === 'MEDIUM') {
+                resultCard.className = 'mt-6 rounded-xl border border-amber-500/50 bg-amber-950/20 p-5';
+                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40';
+                badge.innerText = 'SUSPICIOUS';
+            } else {
+                resultCard.className = 'mt-6 rounded-xl border border-emerald-500/50 bg-emerald-950/20 p-5';
+                badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+                badge.innerText = 'LIKELY SAFE';
+            }
+        } catch (err) {
+            alert('Could not connect to backend. Make sure Spring Boot is running!');
+        } finally {
+            // Reset Button
+            btn.disabled = false;
+            btn.innerHTML = '<span>Analyze Threat Level</span>';
+        }
+    }
+</script>
+</body>
+</html>
